@@ -1,0 +1,84 @@
+---
+title: "PytrendsLongitudinalR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PytrendsLongitudinalR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+Welcome to the vignette for PytrendsLongitudinalR, a package for collecting and analyzing Google Trends data over time. This vignette will guide you through the setup process and show you how to use the package's main functionalities.
+
+This is a package for downloading cross-section and time-series Google Trends and converting them to longitudinal data.
+Although Google Trends provides cross-section and time-series search data, longitudinal Google Trends data are not readily available. There exist several practical issues that make it difficult for researchers to generate longitudinal Google Trends data themselves. First, Google Trends provides normalized counts from zero to 100. As a result, combining different regions' time-series Google Trends data does not create desired longitudinal data. For the same reason, combining cross-sectional Google Trends data over time does not create desired longitudinal data. Second, Google Trends has restrictions on data formats and timeline. For instance, if you want to collect daily data for 2 years, you cannot do so. Google Trends automatically provides weekly data if your request timeline is more than 269 days. Similarly, Google Trends automatically provides monthly data if your request timeline is more than 269 weeks even though you want to collect weekly data.
+This package resolves the aforementioned issues and allows researchers to generate longitudinal Google Trends.
+
+## Installation
+
+Make sure Python is installed on your system. You can download from www.python.org/downloads, or call the install_python() from reticulate.
+
+Finally, load the library and call install_pytrendslongitudinalr() function to install PytrendsLongitudinalR. This will automatically create an isolated virtual environment named “pytrends-in-r-new”
+```{r installation, eval = FALSE}
+
+library(PytrendsLongitudinalR)
+install_pytrendslongitudinalr(envname = "pytrends-in-r-new")
+
+```
+
+
+## Usage
+
+Now you can start using PytrendsLongitudinalR to collect Google Trends data.
+```{r usage, eval = FALSE}
+library(PytrendsLongitudinalR)
+
+# Initialize parameters for data collection
+params <- initialize_request_trends(
+  keyword = "Coronavirus disease 2019",
+  topic = "/g/11j2cc_qll",
+  folder_name = file.path(tempdir(), "test_folder"),
+  start_date = "2024-05-01",
+  end_date = "2024-05-03",
+  data_format = "daily"
+)
+
+# Collect cross-section data
+cross_section(params, geo = "US", resolution = "REGION") # REGION as a resolution is a sub-region of US in this example, and it indicates US states.
+
+# Collect reference time-series data
+time_series(params, reference_geo_code = "US-CA") # The selected reference is California and its Google Trends Geo is 'US-CA'.
+
+# Given the short time period in this example, no concatenation is needed.
+concat_time_series(params, reference_geo_code = "US", zero_replace = 0.1) # Error occurs because given period is less than 269 days, concatenation is unnecessary. You can move to convert_cross_section() without any problems.
+
+# Use the reference time-series data to re-scale the cross-sectional data. 
+convert_cross_section(params, reference_geo_code = "US-CA")
+```
+
+## WARNING
+We recommend that the user run the functions in the following sequence:
+
+cross_section
+
+time_series
+
+concat_time_series
+
+convert_time_series
+
+First, the cross-sectional and reference time-series data must be created. The concat_time_series() function uses the reference time-series data files to concatenate multiple sets of time series. Finally, the convert_time_series() function uses the concatenated reference time series to re-scale the cross-sectional data. 
+
+The user may encounter a 429 Too Many Requests error when using cross_section() and time_series() to collect Google Trends data. This error indicates that the user has exceeded the rate limits set by the Google Trends API.
+Here are a few strategies to mitigate the impact of this error:
+
+1) Lower the frequency of your requests or extend the interval between requests. If you're making requests with high frequency, consider spacing them out or reducing the number of requests made in a given time frame.
+
+2) If you're querying a large time range or a high-resolution granularity, try reducing the scope of your queries. Smaller time periods and/or lower resolution might help stay within the rate limits.
