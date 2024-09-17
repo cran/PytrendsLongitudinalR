@@ -14,7 +14,7 @@ install_pytrendslongitudinalr <- function(envname = "pytrends-in-r-new", new_env
 
   # Install the required Python packages
   reticulate::py_install(
-    c("pandas", "requests", "pytrends", "rich"),
+    c("pandas", "requests", "pytrends"),
     envname = envname,
     ...
   )

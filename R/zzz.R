@@ -13,7 +13,7 @@ relativedelta <- NULL
 time <- NULL
 logging <- NULL
 console <- NULL
-rc <- NULL
+#rc <- NULL
 math <- NULL
 platform <- NULL
 
@@ -36,7 +36,7 @@ platform <- NULL
   time <<- reticulate::import("time", delay_load = TRUE)
   logging <<- reticulate::import("logging", delay_load = TRUE)
   console <<- reticulate::import("rich.console", delay_load = TRUE)
-  rc <<- reticulate::import("rich.logging", delay_load = TRUE)
+  #rc <<- reticulate::import("rich.logging", delay_load = TRUE)
   math <<- reticulate::import("math", delay_load = TRUE)
   platform <<- reticulate::import("platform", delay_load = TRUE)
 
@@ -60,5 +60,4 @@ platform <- NULL
     stop("Initialization aborted by the user.")
   }
 }
-
 
